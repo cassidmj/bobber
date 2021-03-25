@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Bobber.API.Migrations;
+using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +29,13 @@ namespace Bobber.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddLogging(s => s.AddFluentMigratorConsole())
+                .AddFluentMigratorCore()
+                .ConfigureRunner(r => r
+                    .AddSqlServer()
+                    .WithGlobalConnectionString(Configuration.GetSection("Database").GetValue<string>("ConnectionString"))
+                    .ScanIn(Assembly.GetExecutingAssembly()).For.All());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +56,8 @@ namespace Bobber.API
             {
                 endpoints.MapControllers();
             });
+
+            app.Migrate();
         }
     }
 }
