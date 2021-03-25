@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bobber.API.Migrations;
+using Bobber.API.Options;
+using Bobber.API.Repositories;
+using Bobber.API.Services;
 using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,6 +39,12 @@ namespace Bobber.API
                     .AddSqlServer()
                     .WithGlobalConnectionString(Configuration.GetSection("Database").GetValue<string>("ConnectionString"))
                     .ScanIn(Assembly.GetExecutingAssembly()).For.All());
+
+            services.Configure<DatabaseOptions>(Configuration.GetSection("Database"));
+            services.Configure<AuthenticationOptions>(Configuration.GetSection("Authentication"));
+
+            services.AddScoped<IRepository, SqlRepository>();
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

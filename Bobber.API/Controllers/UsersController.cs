@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bobber.API.Models;
+using Bobber.API.Repositories;
+using Bobber.API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +14,33 @@ namespace Bobber.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate(AuthenticateRequest request)
+        private readonly IUserService _userService;
+
+        public UsersController(IUserService userService)
         {
-            return Ok($"hello: {request.Email}");
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
+
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> Authenticate(AuthenticateRequest request)
+        {
+            var result = await _userService.AuthenticateUserAsync(request);
+
+            if (result.IsAuthorized)
+            {
+                return Ok(result);
+            }
+
+            return Unauthorized();
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequest request)
+        {
+            await _userService.RegisterUserAsync(request);
+
+            return Ok(new { message = "registration successful" });
+        }
+
     }
 }
