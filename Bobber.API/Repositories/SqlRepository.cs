@@ -34,6 +34,16 @@ namespace Bobber.API.Repositories
             return user;
         }
 
+        public async Task<User> GetUserAsync(long id)
+        {
+            string query = @"SELECT * FROM Users WHERE Id = @id";
+
+            using var connection = new SqlConnection(_connectionString);
+            User user = await connection.QueryFirstAsync<User>(query, new { id });
+
+            return user;
+        }
+
         public async Task InsertUserAsync(string email, string passwordHash, string firstName, string lastName)
         {
             string query = @"INSERT INTO Users(PasswordHash, Email, FirstName, LastName) VALUES (@passwordHash, @email, @firstName, @lastName)";

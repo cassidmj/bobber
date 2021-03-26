@@ -11,5 +11,7 @@ namespace Bobber.API.Repositories
         Task InsertUserAsync(string email, string passwordHash, string firstName, string lastName);
 
         Task<User> GetUserAsync(string email);
+
+        Task<User> GetUserAsync(long id);
     }
 }
