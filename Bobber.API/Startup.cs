@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Bobber.API.Middleware;
 using Bobber.API.Migrations;
 using Bobber.API.Options;
 using Bobber.API.Repositories;
@@ -55,18 +56,20 @@ namespace Bobber.API
                 app.UseDeveloperExceptionPage();
             }
 
+
+            app.Migrate();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
+            app.UseMiddleware<JwtMiddleware>();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
-            app.Migrate();
         }
     }
 }
